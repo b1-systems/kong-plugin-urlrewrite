@@ -7,7 +7,12 @@ local schema = {
   name = plugin_name,
   fields = {
     -- the 'fields' array is the top-level entry with fields defined by Kong
-    { consumer = typedefs.no_consumer },  -- this plugin cannot be configured on a consumer (typical for auth plugins)
+    -- this plugin cannot be configured on a consumer
+    { consumer = typedefs.no_consumer },
+    -- this plugin cannot be configured on a service
+    { service = typedefs.no_service },
+    -- plugin works on http
+    -- TODO: should also work on https
     { protocols = typedefs.protocols_http },
     { config = {
         -- The 'config' record is the custom part of the plugin schema
