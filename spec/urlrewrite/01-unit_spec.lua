@@ -18,6 +18,12 @@ describe(PLUGIN_NAME .. ": (schema)", function()
         assert(validate({}))
     end)
 
+    it("full config validates", function()
+        assert(validate({
+                rewrite_header = "Rewrite-To"
+            }))
+    end)
+
   --it("accepts distinct request_header and response_header", function()
   --  local ok, err = validate({
   --      request_header = "My-Request-Header",
