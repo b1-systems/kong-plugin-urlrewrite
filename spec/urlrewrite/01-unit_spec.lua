@@ -24,31 +24,13 @@ describe(PLUGIN_NAME .. ": (schema)", function()
             }))
     end)
 
-  --it("accepts distinct request_header and response_header", function()
-  --  local ok, err = validate({
-  --      request_header = "My-Request-Header",
-  --      response_header = "Your-Response",
-  --    })
-  --  assert.is_nil(err)
-  --  assert.is_truthy(ok)
-  --end)
-
-
-  --it("does not accept identical request_header and response_header", function()
-  --  local ok, err = validate({
-  --      request_header = "they-are-the-same",
-  --      response_header = "they-are-the-same",
-  --    })
-
-  --  assert.is_same({
-  --    ["config"] = {
-  --      ["@entity"] = {
-  --        [1] = "values of these fields must be distinct: 'request_header', 'response_header'"
-  --      }
-  --    }
-  --  }, err)
-  --  assert.is_falsy(ok)
-  --end)
+    it("header name must not be empty", function()
+        local config = { rewrite_header = "" }
+        local ok, err = validate(config)
+        assert.falsy(ok)
+        assert.same({ rewrite_header = "length must be at least 1" },
+            err.config)
+    end)
 
 
 end)
