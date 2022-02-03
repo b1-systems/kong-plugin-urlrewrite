@@ -15,7 +15,12 @@ for _, strategy in helpers.all_strategies() do
       -- Inject a test route. No need to create a service, there is a default
       -- service which will echo the request.
       local route1 = bp.routes:insert({
+        --paths = { "path1" },
         hosts = { "test1.com" },
+      })
+      local route2 = bp.routes:insert({
+        --paths = { "path2" },
+        hosts = { "test2.com" },
       })
       -- add the plugin to test to the route we created
       bp.plugins:insert {
@@ -49,41 +54,79 @@ for _, strategy in helpers.all_strategies() do
       if client then client:close() end
     end)
 
-
+    describe("request", function()
+      it("request accepted if header is present and not empty", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test1.com/request",
+          }
+        })
+        assert.res_status(200, r)
+      end)
+    end)
 
     describe("request", function()
-      it("gets a 'hello-world' header", function()
-        local r = client:get("/request", {
+      it("request rejected if header is not present", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
           headers = {
-            host = "test1.com"
+            ["Host"] = "test1.com",
           }
         })
-        -- validate that the request succeeded, response status 200
-        assert.response(r).has.status(200)
-        -- now check the request (as echoed by mockbin) to have the header
-        local header_value = assert.request(r).has.header("hello-world")
-        -- validate the value of that header
-        assert.equal("this is on a request", header_value)
+        assert.res_status(400, r)
       end)
     end)
 
+    --describe("request", function()
+    --  it("rewrite happens on route with the plugin", function()
+    --    local r = client:get("/request", {
+    --      headers = {
+    --        ["Host"] = "test1.com",
+    --        -- TODO: choose a better rewrite target than example.com
+    --        ["Rewrite-To"] = "http://test2.com/request"
+    --      }
+    --    })
+    --    assert.request(r).has.host("test2.com")
+    --  end)
+    --end)
+
+    --describe("request", function()
+    --  it("gets a 'hello-world' header", function()
+    --    local r = client:get("/request", {
+    --      headers = {
+    --        host = "test1.com"
+    --      }
+    --    })
+    --    -- validate that the request succeeded, response status 200
+    --    assert.response(r).has.status(200)
+    --    -- now check the request (as echoed by mockbin) to have the header
+    --    local header_value = assert.request(r).has.header("hello-world")
+    --    -- validate the value of that header
+    --    assert.equal("this is on a request", header_value)
+    --  end)
+    --end)
 
 
-    describe("response", function()
-      it("gets a 'bye-world' header", function()
-        local r = client:get("/request", {
-          headers = {
-            host = "test1.com"
-          }
-        })
-        -- validate that the request succeeded, response status 200
-        assert.response(r).has.status(200)
-        -- now check the response to have the header
-        local header_value = assert.response(r).has.header("bye-world")
-        -- validate the value of that header
-        assert.equal("this is on the response", header_value)
-      end)
-    end)
+
+    --describe("response", function()
+    --  it("gets a 'bye-world' header", function()
+    --    local r = client:get("/request", {
+    --      headers = {
+    --        host = "test1.com"
+    --      }
+    --    })
+    --    -- validate that the request succeeded, response status 200
+    --    assert.response(r).has.status(200)
+    --    -- now check the response to have the header
+    --    local header_value = assert.response(r).has.header("bye-world")
+    --    -- validate the value of that header
+    --    assert.equal("this is on the response", header_value)
+    --  end)
+    --end)
 
   end)
 end

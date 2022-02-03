@@ -33,4 +33,5 @@ describe(PLUGIN_NAME .. ": (schema)", function()
     end)
 
 
+    -- TODO: maybe test if plugin can only be enabled on routes
 end)
