@@ -55,7 +55,7 @@ for _, strategy in helpers.all_strategies() do
     end)
 
     describe("request", function()
-      it("request accepted if header is present and not empty", function()
+      it("accepted if header is present and not empty", function()
         local r = assert(client:send {
           method = "GET",
           path = "/status/200",
@@ -69,12 +69,54 @@ for _, strategy in helpers.all_strategies() do
     end)
 
     describe("request", function()
-      it("request rejected if header is not present", function()
+      it("rejected if header is not present", function()
         local r = assert(client:send {
           method = "GET",
           path = "/status/200",
           headers = {
             ["Host"] = "test1.com",
+          }
+        })
+        assert.res_status(400, r)
+      end)
+    end)
+
+    describe("request", function()
+      it("accepted if header contains URL without path and no trailing slash", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test2.com",
+          }
+        })
+        assert.res_status(200, r)
+      end)
+    end)
+
+    describe("request", function()
+      it("accepted if header contains URL without path and but trailing slash", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test2.com/",
+          }
+        })
+        assert.res_status(200, r)
+      end)
+    end)
+
+    describe("request", function()
+      it("rejected if header contains invalid URL", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "foo://bar",
           }
         })
         assert.res_status(400, r)

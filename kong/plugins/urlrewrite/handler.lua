@@ -75,8 +75,12 @@ function plugin:access(plugin_conf)
       return kong.response.exit(400, "Bad request")
   else
       kong.log.info("Header is not empty. Proceeding with parsing")
-      local pattern = "(https?)://([^/]+)/(.*)"
-      local _, _, scheme, host, path = string.find(rewrite_header, pattern)
+      local pattern = "(https?)://([^/]+)(/?[^?#]*)"
+      local start, _, scheme, host, path = string.find(rewrite_header, pattern)
+      if start == nil then
+          return kong.response.exit(400, "Bad request")
+      end
+
       kong.log.inspect({scheme=scheme, host=host, path=path})
   end
 
