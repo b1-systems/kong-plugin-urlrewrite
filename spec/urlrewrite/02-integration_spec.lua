@@ -123,6 +123,63 @@ for _, strategy in helpers.all_strategies() do
       end)
     end)
 
+    describe("request", function()
+      it("rewritten to the path given in the header", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/404",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test1.com/request",
+          }
+        })
+
+        assert.res_status(200, r)
+
+        local forwarded_path = assert.request(r).has.header("X-Forwarded-Path")
+        assert.are.equal("/request", forwarded_path)
+        local new_uri = assert.request(r).kong_request.vars.uri
+        assert.are.equal("/request", new_uri)
+      end)
+    end)
+
+    describe("request", function()
+      it("rewritten to the host given in the header", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/404",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test2.com/request",
+          }
+        })
+
+        assert.res_status(200, r)
+
+        local new_host = assert.request(r).has.header("Host")
+        assert.are.equal("test2.com", new_host)
+      end)
+    end)
+
+    describe("request", function()
+      it("rewritten to the scheme given in the header", function()
+        local r = assert(client:send {
+          schema = "https",
+          method = "GET",
+          path = "/status/404",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test1.com/request",
+          }
+        })
+
+        assert.res_status(200, r)
+
+        local new_scheme = assert.request(r).kong_request.vars.scheme
+        assert.are.equal("http", new_scheme)
+      end)
+    end)
+
     --describe("request", function()
     --  it("rewrite happens on route with the plugin", function()
     --    local r = client:get("/request", {
