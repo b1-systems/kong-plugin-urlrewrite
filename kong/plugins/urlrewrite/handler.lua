@@ -68,21 +68,21 @@ function plugin:access(plugin_conf)
   -- check if header is not empty
   local rewrite_header = kong.request.get_header(plugin_conf.rewrite_header)
   if rewrite_header == "" then
-      kong.log.err("Header is empty")
-      return kong.response.exit(400, "Bad request")
+    kong.log.err("Header is empty")
+    return kong.response.exit(400, "Bad request")
   elseif rewrite_header == nil then
-      kong.log.err("Header is nil")
-      return kong.response.exit(400, "Bad request")
-  else
-      kong.log.info("Header is not empty. Proceeding with parsing")
-      local pattern = "(https?)://([^/]+)(/?[^?#]*)"
-      local start, _, scheme, host, path = string.find(rewrite_header, pattern)
-      if start == nil then
-          return kong.response.exit(400, "Bad request")
-      end
-
-      kong.log.inspect({scheme=scheme, host=host, path=path})
+    kong.log.err("Header is nil")
+    return kong.response.exit(400, "Bad request")
   end
+
+  kong.log.info("Header is not empty. Proceeding with parsing")
+  local pattern = "(https?)://([^/]+)(/?[^?#]*)"
+  local start, _, scheme, host, path = string.find(rewrite_header, pattern)
+  if start == nil then
+    return kong.response.exit(400, "Bad request")
+  end
+
+  kong.log.inspect({scheme=scheme, host=host, path=path})
 
 end --]]
 
