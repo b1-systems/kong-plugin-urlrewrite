@@ -136,8 +136,6 @@ for _, strategy in helpers.all_strategies() do
 
         assert.res_status(200, r)
 
-        local forwarded_path = assert.request(r).has.header("X-Forwarded-Path")
-        assert.are.equal("/request", forwarded_path)
         local new_uri = assert.request(r).kong_request.vars.uri
         assert.are.equal("/request", new_uri)
       end)
