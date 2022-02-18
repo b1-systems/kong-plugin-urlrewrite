@@ -81,6 +81,20 @@ for _, strategy in helpers.all_strategies() do
       end)
     end)
 
+    describe("request", function ()
+      it("not rewritten if request goes to route without plugin", function ()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
+          headers = {
+            ["Host"] = "test2.com",
+            ["Rewrite-To"] = "http://test1.com/status/404",
+          }
+        })
+        assert.res_status(200, r)
+      end)
+    end)
+
     describe("request", function()
       it("accepted if header contains URL without path and no trailing slash", function()
         local r = assert(client:send {
