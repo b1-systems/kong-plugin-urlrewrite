@@ -8,6 +8,9 @@ package = package_name
 version = package_version .. "-" .. rockspec_revision
 supported_platforms = { "linux", "macosx" }
 
+source = {
+    url = "..."
+}
 
 description = {
   summary = "Kong plugin to rewrite scheme, host and/or path of a request by header.",
