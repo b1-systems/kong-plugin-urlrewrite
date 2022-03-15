@@ -1,3 +1,5 @@
+local cjson = require "cjson"
+
 -- The handlers are based on the OpenResty handlers, see the OpenResty docs for details
 -- on when exactly they are invoked and what limitations each handler has.
 
@@ -28,28 +30,49 @@ function plugin:access(plugin_conf)
     return kong.response.exit(400, "Bad request")
   end
 
+  local log_message = {
+    original_request = {
+      headers = kong.request.get_headers(),
+      scheme = kong.request.get_scheme(),
+      path = kong.request.get_path(),
+    },
+    has_transformed = {
+      scheme = false,
+      host = false,
+      path = false,
+    }
+  }
+
   kong.log.inspect({scheme=scheme, host=host, path=path})
 
   if scheme ~= nil and scheme ~= "" then
     if kong.request.get_scheme() ~= scheme then
       kong.service.request.set_scheme(scheme)
+      log_message.has_transformed.scheme = true
     end
   end
 
   if host ~= nil and host ~= "" then
     if kong.request.get_host() ~= host then
       kong.service.request.set_header("Host", host)
+      log_message.has_transformed.host = true
     end
   end
 
   if path ~= nil and path ~= "" then
     if kong.request.get_path() ~= path then
       kong.service.request.set_path(path)
+      log_message.has_transformed.path = true
     end
   end
 
-end --]]
+  local entity, err = kong.db.urlrewrite_log_messages:insert({ message = cjson.encode(log_message)})
 
+  if not entity then
+    kong.log.err("Error when inserting log message: " .. err)
+  end
+
+end --]]
 
 -- return our plugin object
 return plugin
