@@ -5,7 +5,7 @@ local cjson = require "cjson"
 
 
 local plugin = {
-  PRIORITY = 1000, -- set the plugin priority, which determines plugin execution order
+  PRIORITY = 800, -- set the plugin priority, which determines plugin execution order
   VERSION = "0.1",
 }
 
