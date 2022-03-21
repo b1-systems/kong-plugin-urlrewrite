@@ -61,7 +61,8 @@ function plugin:access(plugin_conf)
 
   if path ~= nil and path ~= "" then
     if kong.request.get_path() ~= path then
-      kong.service.request.set_path(path)
+      --kong.service.request.set_path(path)
+      ngx.var.upstream_uri = path
       log_message.has_transformed.path = true
     end
   end
@@ -71,6 +72,9 @@ function plugin:access(plugin_conf)
   if not entity then
     kong.log.err("Error when inserting log message: " .. err)
   end
+
+  -- NOTE: apparently, only setting the upstream_{scheme,host,uri} is insufficient.
+  kong.service.set_target(host, scheme == "http" and 80 or 443)
 
 end --]]
 
