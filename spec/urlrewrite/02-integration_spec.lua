@@ -95,7 +95,7 @@ for _, strategy in helpers.all_strategies() do
         --paths = { "path1" },
         hosts = { "test1.com" },
       })
-      local route2 = bp.routes:insert({
+      local _ = bp.routes:insert({
         service = service_upstream1,
         --paths = { "path2" },
         hosts = { "test2.com" },
