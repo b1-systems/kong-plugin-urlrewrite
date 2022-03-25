@@ -25,10 +25,7 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    ["kong.plugins."..plugin_name..".daos"] = "kong/plugins/"..plugin_name.."/daos.lua",
     ["kong.plugins."..plugin_name..".handler"] = "kong/plugins/"..plugin_name.."/handler.lua",
-    ["kong.plugins."..plugin_name..".migrations"] = "kong/plugins/"..plugin_name.."/migrations/init.lua",
-    ["kong.plugins."..plugin_name..".migrations.000_base_urlrewrite.lua"] = "kong/plugins/"..plugin_name.."/migrations/000_base_urlrewrite.lua",
     ["kong.plugins."..plugin_name..".schema"] = "kong/plugins/"..plugin_name.."/schema.lua",
   }
 }

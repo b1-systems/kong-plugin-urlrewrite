@@ -43,7 +43,7 @@ function plugin:access(plugin_conf)
     }
   }
 
-  kong.log.inspect({scheme=scheme, host=host, path=path})
+  kong.log.debug("scheme="..scheme..", ".."host="..host..", ".."path="..path)
 
   if scheme ~= nil and scheme ~= "" then
     if kong.request.get_scheme() ~= scheme then
@@ -67,14 +67,10 @@ function plugin:access(plugin_conf)
     end
   end
 
-  local entity, err = kong.db.urlrewrite_log_messages:insert({ message = cjson.encode(log_message)})
-
-  if not entity then
-    kong.log.err("Error when inserting log message: " .. err)
-  end
-
   -- NOTE: apparently, only setting the upstream_{scheme,host,uri} is insufficient.
   kong.service.set_target(host, scheme == "http" and 80 or 443)
+
+  kong.log.debug(cjson.encode(log_message))
 
 end --]]
 
