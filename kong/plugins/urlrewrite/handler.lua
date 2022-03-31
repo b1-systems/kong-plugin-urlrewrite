@@ -1,5 +1,7 @@
 local cjson = require "cjson"
 
+local utils = require "kong.tools.utils"
+
 -- The handlers are based on the OpenResty handlers, see the OpenResty docs for details
 -- on when exactly they are invoked and what limitations each handler has.
 
@@ -30,6 +32,21 @@ function plugin:access(plugin_conf)
     return kong.response.exit(400, "Bad request")
   end
 
+  local port = (scheme == "http") and 80 or 443
+
+  -- special case: scheme://host:port/path
+  local _host, _port = utils.unpack(utils.split(host, ":"))
+  if _port ~= nil then
+    local ok, _port_num = pcall(tonumber, _port)
+    if not ok or _port_num == nil then
+      return kong.response.exit(500,
+        [[{"message": "Internal Server Error", "details": "Port in rewrite target is NaN"}]],
+        {["Content-Type"] = "application/json"}
+      )
+    end
+    host, port = _host, _port_num
+  end
+
   local log_message = {
     original_request = {
       headers = kong.request.get_headers(),
@@ -43,7 +60,10 @@ function plugin:access(plugin_conf)
     }
   }
 
-  kong.log.debug("scheme="..scheme..", ".."host="..host..", ".."path="..path)
+  kong.log.debug("scheme=" .. scheme
+    .. ", host=" .. host
+    .. ", port=" .. port
+    .. ", path=" .. path)
 
   if scheme ~= nil and scheme ~= "" then
     if kong.request.get_scheme() ~= scheme then
@@ -68,7 +88,7 @@ function plugin:access(plugin_conf)
   end
 
   -- NOTE: apparently, only setting the upstream_{scheme,host,uri} is insufficient.
-  kong.service.set_target(host, scheme == "http" and 80 or 443)
+  kong.service.set_target(host, port)
 
   kong.log.debug(cjson.encode(log_message))
 

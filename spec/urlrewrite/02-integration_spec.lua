@@ -232,6 +232,20 @@ for _, strategy in helpers.all_strategies() do
     end)
 
     describe("request", function()
+      it("rejected if header contains URL with malformed port", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test1.localhost:8a0/request",
+          }
+        })
+        assert.res_status(500, r)
+      end)
+    end)
+
+    describe("request", function()
       it("rewritten to the path given in the header", function()
         local r = assert(client:send {
           method = "GET",
@@ -283,6 +297,20 @@ for _, strategy in helpers.all_strategies() do
 
         local new_scheme = assert.request(r).kong_request.vars.scheme
         assert.are.equal("http", new_scheme)
+      end)
+    end)
+
+    describe("request", function()
+      it("passes if header contains URL with port number", function()
+        local r = assert(client:send {
+          method = "GET",
+          path = "/status/200",
+          headers = {
+            ["Host"] = "test1.com",
+            ["Rewrite-To"] = "http://test1.localhost:80/request",
+          }
+        })
+        assert.res_status(200, r)
       end)
     end)
 
