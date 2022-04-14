@@ -16,13 +16,12 @@ local plugin = {
 function plugin:access(plugin_conf)
   local rewrite_header = kong.request.get_header(plugin_conf.rewrite_header)
   if rewrite_header == "" then
-    -- check if header is not empty
+    -- return with error if header is set but empty
     kong.log.err("Header is empty")
     return kong.response.exit(400, "Bad request")
   elseif rewrite_header == nil then
-    -- check if header exists
-    kong.log.err("Header is nil")
-    return kong.response.exit(400, "Bad request")
+    -- skip processing if header is not set
+    return plugin
   end
 
   kong.log.info("Header is not empty. Proceeding with parsing")

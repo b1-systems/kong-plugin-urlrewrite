@@ -163,7 +163,7 @@ for _, strategy in helpers.all_strategies() do
     end)
 
     describe("request", function()
-      it("rejected if header is not present", function()
+      it("accepted but processing skipped if header is not present", function()
         local r = assert(client:send {
           method = "GET",
           path = "/status/200",
@@ -171,7 +171,7 @@ for _, strategy in helpers.all_strategies() do
             ["Host"] = "test1.com",
           }
         })
-        assert.res_status(400, r)
+        assert.res_status(200, r)
       end)
     end)
 
