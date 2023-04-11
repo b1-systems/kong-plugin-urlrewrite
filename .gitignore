@@ -9,3 +9,6 @@ servroot
 luacov.stats.out
 # exclude LuaCov report
 luacov.report.out
+
+.direnv
+result
